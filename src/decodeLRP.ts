@@ -8,5 +8,7 @@ export function getLRP(openLrString: string): LRPObject{
     const rawLocationReference = binaryDecoder.decodeData(locationReference);
     const LRPObject = openlrJS.Serializer.serialize(rawLocationReference);
     LRPObject.openLRRef = openLrString;
+    if(LRPObject.type === "RawInvalidLocationReference")
+        throw new Error("Invalid OpenLR string");
     return LRPObject;
 }

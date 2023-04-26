@@ -1,6 +1,7 @@
 /* istanbul ignore file */
 import { decodeOpenLRReference, OpenLRDecodeOptions } from "./src/openLRDecode";
 import { configureStorage } from "./src/storage";
+import type {decodedRoute} from "./src/LRP";
 
 export { OpenLRDecodeOptions } from "./src/openLRDecode";
 
@@ -15,25 +16,6 @@ export interface storageOptions {
     username?: string;
     password?: string;
     authMechanism?: string;
-}
-
-export interface decodedRoute {
-    route: Array<{ 
-        length: number; 
-        linkid: string; 
-    }>; 
-    routeLength: number; 
-    nodes: string[]; 
-    openLRRef: string; 
-    openLRDistance: number;
-}
-
-export interface decodeFail {
-    route: null; 
-    routeLength: null; 
-    nodes: null; 
-    openLRRef: string; 
-    openLRDistance: number;
 }
 
 /**
@@ -52,7 +34,7 @@ export async function initStorage(storageOptions: storageOptions): Promise<unkno
  * @param options {object} - Options for the OpenLR decoding. The radius to search for candidate nodes in meters. The tolerance for matching link bearings in degrees.
  * @returns {Promise} - Returns a promise with the decode result
  */
-export async function decodeOpenLR(openLRRef: string, options: OpenLRDecodeOptions): Promise<decodedRoute | decodeFail> {
+export async function decodeOpenLR(openLRRef: string, options: OpenLRDecodeOptions): Promise<decodedRoute> {
     return decodeOpenLRReference(openLRRef, options);
 }
 

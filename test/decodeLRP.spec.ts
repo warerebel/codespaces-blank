@@ -12,9 +12,17 @@ describe("decodeToLRP", function(){
         });
 
         it("returns an error if fed junk data", function(){
-            const expected = JSON.parse("{\"openLRRef\": \"CwNhbCU+j\", \"type\": \"RawInvalidLocationReference\",\"properties\": {\"_id\": \"binary\",\"_locationType\": 0,\"_returnCode\": 4}}");
-            const result = getLRP("CwNhbCU+j");
-            assert.deepStrictEqual(result, expected);
+            try{
+                getLRP("CwNhbCU+j");
+                assert.ok(false);
+            } catch(error){
+                if(error instanceof Error){
+                    const expected = "Invalid OpenLR string";
+                    assert.deepStrictEqual(error.message, expected);
+                } else 
+                    assert.ok(false);
+            }
+            
         });
 
     });

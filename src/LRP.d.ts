@@ -36,3 +36,15 @@ export interface LRPObject {
         }
     }
 }
+
+export interface decodedRoute {
+    route: Array<{ 
+        length: number; 
+        linkid: string; 
+    }> | null; 
+    routeLength: number | null; 
+    nodes: string[] | null; 
+    openLRRef: string; 
+    openLRDistance: number | null;
+    failureReason: string | null;
+}
