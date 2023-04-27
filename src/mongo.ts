@@ -2,6 +2,7 @@ import type {MongoClient, Db} from "mongodb";
 import type {Polygon} from "./getCandidates";
 import {storageOption} from "./storageOption";
 import type {storageOptions} from "../index";
+import type { node } from "./nodes";
 
 /* istanbul ignore file */
 
@@ -33,7 +34,7 @@ export class Mongo extends storageOption{
         }
     }
 
-    override async findNodesNearPoint(latitude: number, longitude: number, searchRadius: number){
+    override async findNodesNearPoint(latitude: number, longitude: number, searchRadius: number): Promise<Array<node>> {
         const collection = Mongo.db.collection("nodes");
         return collection.find({
             geometry: {
@@ -43,10 +44,10 @@ export class Mongo extends storageOption{
                     $maxDistance: searchRadius
                 }
             }
-        }).toArray();
+        }).toArray() as unknown as Array<node>;
     }
 
-    override async findNodesInPolygon(polygon: Polygon): Promise<unknown> {
+    override async findNodesInPolygon(polygon: Polygon): Promise<Array<node>> {
         const collection = Mongo.db.collection("nodes");
         return collection.find({
             geometry: {
@@ -54,7 +55,7 @@ export class Mongo extends storageOption{
                     $geometry: polygon
                 }
             }
-        }).toArray();
+        }).toArray() as unknown as Array<node>;
     }
 
     override async close(): Promise<unknown> {

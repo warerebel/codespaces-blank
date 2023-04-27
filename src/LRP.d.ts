@@ -1,3 +1,5 @@
+import type { node } from "./nodes";
+
 export interface LRP {
     type: string,
     properties: {
@@ -47,4 +49,10 @@ export interface decodedRoute {
     openLRRef: string; 
     openLRDistance: number | null;
     failureReason: string | null;
+}
+
+export interface decodingProcess {
+    LRP: LRPObject | null;
+    candidateNodes: Array<Array<node>>;
+    winningNodes: Array<string>;
 }

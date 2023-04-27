@@ -3,6 +3,7 @@ import {decodeOpenLRReference, OpenLRDecodeOptions} from "../src/openLRDecode";
 import * as assert from "assert";
 import * as sinon from "sinon";
 import {configureStorage} from "../src/storage";
+import type { node } from "../src/nodes";
 
 import routeOneCandidateNodesOne from "./resources/routeOneCandidateNodesOne.json";
 import routeOneCandidateNodesTwo from "./resources/routeOneCandidateNodesTwo.json";
@@ -34,20 +35,20 @@ describe("openLRDecode", function(){
 
             // Simulate geo-lookup of nodes from storage
             const findStub = sinon.stub(configureStorage, "findNodesNearPoint");
-            findStub.onCall(0).resolves(routeOneCandidateNodesOne);
-            findStub.onCall(1).resolves(routeOneCandidateNodesTwo);
-            findStub.onCall(2).resolves(routeOneCandidateNodesOne);
-            findStub.onCall(3).resolves(routeOneCandidateNodesTwo);
-            findStub.onCall(4).resolves(routeTwoCandidateNodesOne);
-            findStub.onCall(5).resolves(routeTwoCandidateNodesTwo);
-            findStub.onCall(6).resolves(routeTwoCandidateNodesThree);
-            findStub.onCall(7).resolves(routeOneCandidateNodesTwo);
-            findStub.onCall(8).resolves(routeOneCandidateNodesOne);
-            findStub.onCall(9).resolves(routeOneCandidateNodesOne);
-            findStub.onCall(10).resolves(routeOneCandidateNodesTwo);
+            findStub.onCall(0).resolves(routeOneCandidateNodesOne as node[]);
+            findStub.onCall(1).resolves(routeOneCandidateNodesTwo as node[]);
+            findStub.onCall(2).resolves(routeOneCandidateNodesOne as node[]);
+            findStub.onCall(3).resolves(routeOneCandidateNodesTwo as node[]);
+            findStub.onCall(4).resolves(routeTwoCandidateNodesOne as node[]);
+            findStub.onCall(5).resolves(routeTwoCandidateNodesTwo as node[]);
+            findStub.onCall(6).resolves(routeTwoCandidateNodesThree as node[]);
+            findStub.onCall(7).resolves(routeOneCandidateNodesTwo as node[]);
+            findStub.onCall(8).resolves(routeOneCandidateNodesOne as node[]);
+            findStub.onCall(9).resolves(routeOneCandidateNodesOne as node[]);
+            findStub.onCall(10).resolves(routeOneCandidateNodesTwo as node[]);
             
             // Simulate geo-lookup of all nodes in LRP polygon
-            sinon.stub(configureStorage, "findNodesInPolygon").resolves(allNodes);
+            sinon.stub(configureStorage, "findNodesInPolygon").resolves(allNodes as node[]);
         });
 
         it("decodes an openLRRef with lfrc to a route of linkids", async function(){

@@ -3,7 +3,7 @@ import { getCandidatesForLRP, getNodesForGraph } from "./getCandidates";
 import { chooseWinningNodes } from "./chooseWinningNodes";
 import { buildLinkLookups, getGraph } from "./graph";
 import type { linkLookup, node } from "./nodes";
-import type { LRPObject, LRP, decodedRoute } from "./LRP";
+import type { LRPObject, LRP, decodedRoute, decodingProcess } from "./LRP";
 import type Graph from "node-dijkstra";
 
 type PathResult = {
@@ -18,12 +18,17 @@ export interface OpenLRDecodeOptions {
 
 export async function decodeOpenLRReference(openLRRef: string, options: OpenLRDecodeOptions): Promise<decodedRoute> {
     try {
-        const decodedOpenLR = getLRP(openLRRef);
-        const distance = decodedOpenLR.properties._points.properties.reduce(getLRPObjectLength, 0);
-        const winningNodes = await getWinningNodes(decodedOpenLR, options);
-        if (winningNodes.length > 1) {
-            const graph = await buildGraph(decodedOpenLR);
-            const path = getPath(winningNodes as string[], graph.graph);
+        const decodingProgress: decodingProcess = {
+            LRP: null,
+            candidateNodes: [],
+            winningNodes: []
+        };
+        decodingProgress.LRP = getLRP(openLRRef);
+        const distance = decodingProgress.LRP.properties._points.properties.reduce(getLRPObjectLength, 0);
+        const decodingProgressWithNodes = await getWinningNodes(decodingProgress, options);
+        if (decodingProgressWithNodes.winningNodes.length > 1) {
+            const graph = await buildGraph(decodingProgress.LRP);
+            const path = getPath(decodingProgressWithNodes.winningNodes as string[], graph.graph);
             const route = getRoute(path.path, graph.linklookup);
             return { route: route, nodes: path.path, routeLength: path.cost, openLRRef: openLRRef, openLRDistance: distance, failureReason: null };
         }
@@ -32,17 +37,19 @@ export async function decodeOpenLRReference(openLRRef: string, options: OpenLRDe
         if (error instanceof Error)
             return { route: null, nodes: null, routeLength: null, openLRRef: openLRRef, openLRDistance: null, failureReason: error.message };
     }
-    return { route: null, nodes: null, routeLength: null, openLRRef: openLRRef, openLRDistance: null, failureReason: null }
+    return { route: null, nodes: null, routeLength: null, openLRRef: openLRRef, openLRDistance: null, failureReason: null };
 }
 
 function getLRPObjectLength(prev: number, cur: LRP) {
     return prev + cur.properties._distanceToNext;
 }
 
-async function getWinningNodes(decodedOpenLR: LRPObject, options: OpenLRDecodeOptions) {
-    const candidateNodes = await getCandidatesForLRP(decodedOpenLR, options.searchRadius) as unknown as node[][];
-    const winningNodes = chooseWinningNodes(decodedOpenLR, candidateNodes, options.targetBearing);
-    return winningNodes;
+async function getWinningNodes(decodingProgress: decodingProcess, options: OpenLRDecodeOptions) {
+    if (decodingProgress.LRP !== null) {
+        decodingProgress.candidateNodes = await getCandidatesForLRP(decodingProgress.LRP, options.searchRadius);
+        decodingProgress.winningNodes = chooseWinningNodes(decodingProgress, options.targetBearing);
+    }
+    return decodingProgress;
 }
 
 async function buildGraph(decodedOpenLR: LRPObject) {
